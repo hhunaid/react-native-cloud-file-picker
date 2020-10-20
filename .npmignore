@@ -1,0 +1,11 @@
+src/
+Example/
+previews/
+README.md
+tsconfig.json
+tslint.json
+node_modules
+.prettierrc
+.watchmanconfig
+.idea
+/android/build/
