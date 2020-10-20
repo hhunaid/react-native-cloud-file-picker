@@ -28,17 +28,32 @@ public class CloudPicker: NSObject {
         }
     }
     
+    @objc static func moduleName() -> String! {
+        return "CloudPicker"
+    }
+        
+    @objc static func requiresMainQueueSetup() -> Bool {
+        return true
+    }
+    
     @objc(pickDropBoxFile:resolver:rejecter:)
-    func pickDropBoxFile(appKey: String, resolver: RCTPromiseResolveBlock, rejecter: RCTPromiseRejectBlock) {
+    func pickDropBoxFile(appKey: String, resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
         if (dBChooser == nil) {
             dBChooser = DBChooser.init(appKey: appKey)
         }
-        guard let viewController = UIApplication.shared.delegate?.window??.rootViewController else {
-            rejecter("1", "rootViewController is nil", nil)
-            return
+        DispatchQueue.main.async {
+            guard let viewController = UIApplication.shared.delegate?.window??.rootViewController else {
+                rejecter("1", "rootViewController is nil", nil)
+                return
+            }
+            self.dBChooser!.open(for: DBChooserLinkTypeDirect, from: viewController, completion: { (results) in
+                guard let results = results as? [DBChooserResult], results.count > 0 else {
+                    rejecter("-1", "Cancelled by user", nil)
+                    return
+                }
+                let response = results.first!
+                resolver(response.link.absoluteString)
+            })
         }
-        dBChooser!.open(for: DBChooserLinkTypeDirect, from: viewController, completion: { (results) in
-            print(results)
-        })
     }
 }
