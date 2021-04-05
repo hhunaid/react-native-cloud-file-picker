@@ -52,7 +52,8 @@ public class CloudPicker: NSObject {
                     return
                 }
                 let response = results.first!
-                resolver(["uri": response.link.absoluteString, "thumbnails": response.thumbnails as Any])
+                let thumbnails = response.thumbnails as! [String: URL]
+                resolver(["uri": response.link.absoluteString, "thumbnails": thumbnails.mapValues({ $0.absoluteString })])
             })
         }
     }
