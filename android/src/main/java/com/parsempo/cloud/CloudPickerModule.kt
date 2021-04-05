@@ -36,7 +36,10 @@ class CloudPickerModule(private val reactContext: ReactApplicationContext) : Rea
         if (requestCode == DBX_CHOOSER_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 val result = DbxChooser.Result(data)
-                promise?.resolve(result.link.toString())
+                val response = Arguments.createMap()
+                response.putString("uri", result.link.toString())
+                response.putMap("thumbnails", Arguments.makeNativeMap(result.thumbnails.mapValues { it.value.toString() }))
+                promise?.resolve(response)
             } else {
                 promise?.reject("-1", "Cancelled by user")
             }
